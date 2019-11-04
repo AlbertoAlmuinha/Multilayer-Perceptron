@@ -1,17 +1,6 @@
-library(pracma)
 library(purrr)
 library(zeallot)
-library(caret)
-library(dummies)
-library(data.table)
-library(purrr)
 library(dplyr)
-
-notas_alumnos <- fread('C:/Users/albgonzal/Documents/Desarrollo R/Algoritmos/data.csv', data.table = F, header = T)
-notas_alumnos$`score-1` <- (notas_alumnos$`score-1` - min(notas_alumnos$`score-1`))/ (max(notas_alumnos$`score-1`) - min(notas_alumnos$`score-1`))
-notas_alumnos$`score-2` <- (notas_alumnos$`score-2` - min(notas_alumnos$`score-2`))/ (max(notas_alumnos$`score-2`) - min(notas_alumnos$`score-2`))
-
-for (i in seq(8)){ notas_alumnos<-rbind(notas_alumnos, notas_alumnos)}
 
 ####################################################################################################################################
 #Creamos la clase "Layer" para crear cada capa de la red neuronal:
@@ -31,7 +20,7 @@ setClass("Layer",
 setMethod("initialize", signature("Layer"), function(.Object, n_con, n_neur, train, target, input_neuron = FALSE, active_function){
   
   
-  #Definimos las posibles funciones de activaci髇 de las neuronas:
+  #Definimos las posibles funciones de activaci贸n de las neuronas:
   
   sigmoid_fun<-list(sigmoid = function(x){return(1/(1+exp(-x)))}, 
                     sigmoid_deriv=function(x){x*(1-x)})
@@ -73,7 +62,7 @@ setMethod("initialize", signature("Layer"), function(.Object, n_con, n_neur, tra
 multilayer_perceptron<-function(train, test = NULL, target, topology, active_function, lr = 0.1, max_iter = 1000,
                                 cost_function = "cost_fun", multiclass = FALSE, predict = FALSE){
   
-  #Definimos una funci髇 para comprobar que los datos de entrada sean correctos:
+  #Definimos una funci贸n para comprobar que los datos de entrada sean correctos:
   
   perceptron_comprobations<-function(train, test, target, topology, active_function, lr, max_iter, cost_function, multiclass, predict){
 
@@ -113,17 +102,17 @@ multilayer_perceptron<-function(train, test = NULL, target, topology, active_fun
 
   }
   
-  #Llamamos a la funci髇 de la comprobaci髇 de par醡etros:
+  #Llamamos a la funci贸n de la comprobaci贸n de par谩metros:
   
   do.call(perceptron_comprobations, list(train, test, target, topology, active_function, lr, max_iter, cost_function, multiclass, predict))
   
-  #Definimos la funci髇 de coste:
+  #Definimos la funci贸n de coste:
   
   cost_fun<-list(cost = function(pred, real){return(mean((pred-real)^2))},
                  cost_deriv = function(pred, real){return(pred-real)})
   
   
-  #Definimos la funci髇 para crear la estructura del perceptr髇 multicapa:
+  #Definimos la funci贸n para crear la estructura del perceptr贸n multicapa:
   
   create_perceptron <- function(topology, train, target, active_function){
     
@@ -162,7 +151,7 @@ multilayer_perceptron<-function(train, test = NULL, target, topology, active_fun
     
   }
   
-  #Definimos la funci髇 que aplica el algoritmo forward_propagation:
+  #Definimos la funci贸n que aplica el algoritmo forward_propagation:
   
   forward_propagation <- function(neural_net){
     
@@ -180,7 +169,7 @@ multilayer_perceptron<-function(train, test = NULL, target, topology, active_fun
   }
   
   
-  #Definimos la funci髇 que aplica el algoritmo back_propagation:
+  #Definimos la funci贸n que aplica el algoritmo back_propagation:
   
   back_propagation<-function(neural_net, x_test, cost_function){
     
@@ -206,7 +195,7 @@ multilayer_perceptron<-function(train, test = NULL, target, topology, active_fun
   }
   
   
-  #Definimos la funci髇 que aplica el algoritmo del descenso del gradiente para entrenar la red:
+  #Definimos la funci贸n que aplica el algoritmo del descenso del gradiente para entrenar la red:
   
   gradient_descent_perceptron<-function(neural_net, x_test, lr, max_iter, threshold = NULL){
     
@@ -266,13 +255,13 @@ multilayer_perceptron<-function(train, test = NULL, target, topology, active_fun
   }
   
   
-  #Seleccionamos la funci髇 de coste seg鷑 el par醡etro seleccionado:
+  #Seleccionamos la funci贸n de coste seg煤n el par谩metro seleccionado:
   
   cost_function<-switch(cost_function,
                         cost_fun = cost_fun)
   
   
-  #Componemos todas las funciones para crear y entrenar el perceptr髇:
+  #Componemos todas las funciones para crear y entrenar el perceptr贸n:
   
   perceptron<-compose(forward_propagation,
                       partial(gradient_descent_perceptron, x_test = train[, target], lr = lr, max_iter = max_iter),
